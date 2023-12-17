@@ -9,5 +9,11 @@ public class ChatHub : Hub
     {
         await Clients.All.SendAsync("ReceberMensagem", usuario, mensagem);
     }
+
+      public async Task ReceberMensagem(string usuario, string mensagem)
+    {
+        await Clients.All.SendAsync("ReceberMensagem", usuario, mensagem);
+    }
+
 }
 }
