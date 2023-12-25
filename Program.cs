@@ -1,21 +1,17 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+
 using Microsoft.OpenApi.Models;
 using ChatHubChat;
-
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
         builder => builder
-            .SetIsOriginAllowed(_ => true) 
+            .WithOrigins("http://localhost:3000") 
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());
 });
-
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
@@ -39,10 +35,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
-app.MapControllers();
-app.MapHub<ChatHub>("/chatHub");
-app.MapGet("/", async context => await context.Response.WriteAsync("Hello World!"));
 
-        app.UseCors("CorsPolicy");
+app.UseCors("CorsPolicy");
+
+app.MapControllers();
+
+app.MapHub<ChatHub>("/chatHub");
 
 await app.RunAsync();
