@@ -1,6 +1,8 @@
-
+using Microsoft.Data.Sqlite;
 using Microsoft.OpenApi.Models;
 using ChatHubChat;
+using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
@@ -12,6 +14,9 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowCredentials());
 });
+
+builder.Services.AddDbContext<UserContext.UserContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Sqlite")));
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
