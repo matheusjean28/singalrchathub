@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Dev\\ChatSignalR\\ChatSignalR.csproj": {}
+    "C:\\dev\\singalrchathub\\ChatSignalR.csproj": {}
   },
   "projects": {
-    "C:\\Dev\\ChatSignalR\\ChatSignalR.csproj": {
+    "C:\\dev\\singalrchathub\\ChatSignalR.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Dev\\ChatSignalR\\ChatSignalR.csproj",
+        "projectUniqueName": "C:\\dev\\singalrchathub\\ChatSignalR.csproj",
         "projectName": "ChatSignalR",
-        "projectPath": "C:\\Dev\\ChatSignalR\\ChatSignalR.csproj",
-        "packagesPath": "C:\\Users\\Matth\\.nuget\\packages\\",
-        "outputPath": "C:\\Dev\\ChatSignalR\\obj\\",
+        "projectPath": "C:\\dev\\singalrchathub\\ChatSignalR.csproj",
+        "packagesPath": "C:\\Users\\sandr\\.nuget\\packages\\",
+        "outputPath": "C:\\dev\\singalrchathub\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Matth\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\sandr\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -26,7 +22,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
+          "C:\\Program Files\\dotnet\\sdk\\7.0.302\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -53,17 +49,19 @@
               "target": "Package",
               "version": "[1.1.0, )"
             },
-            "Microsoft.Data.Sqlite.Core": {
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
-              "version": "[7.0.0-preview.3.22175.1, )"
-            },
-            "Microsoft.EntityFrameworkCore": {
-              "target": "Package",
-              "version": "[7.0.0, )"
+              "version": "[7.0.14, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[7.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[7.0.14, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -89,7 +87,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
         }
       }
     }

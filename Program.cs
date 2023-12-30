@@ -3,20 +3,21 @@ using Microsoft.OpenApi.Models;
 using ChatHubChat;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
+using UserContext;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
         builder => builder
-            .WithOrigins("http://localhost:3000") 
+            .SetIsOriginAllowed(_ => true) 
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());
 });
 
-builder.Services.AddDbContext<UserContext.UserContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Sqlite")));
+builder.Services.AddDbContext<UserDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite")));
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
