@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations;
 namespace UserModel
 {
     public class User
-    {
-        public int Id {get; set;}
+    {   [Key]
+        public int Id {get;set;}
 
         [Required(ErrorMessage = "UserName is required")]
         public required string UserName { get; set; }
