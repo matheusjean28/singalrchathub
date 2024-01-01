@@ -1,10 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UserModel
 {
     public class User
-    {   [Key]
-        public int Id {get;set;}
+    {   [Key ]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
+        public required string Id {get;set;}
 
         [Required(ErrorMessage = "UserName is required")]
         public required string UserName { get; set; }

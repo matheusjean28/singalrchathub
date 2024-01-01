@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 using UserContext;
 using UserModel;
 
@@ -22,14 +21,22 @@ namespace Controllers
             return "alguma coisa";
         }
 
-        [Route("Auth")]
+        [Route("CreateUser")]
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser(User user)
         {
-             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+        
+        if(await CheckIfUserExist(user))
+        {
+            var _userAlreadyExist = $"{user.UserName} Already exist";
+            return Conflict(_userAlreadyExist);
+        }
+        
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
 
-        return Ok(user.UserName);
+        var _userCreated = $"{user.UserName} was created with sucess!";
+        return Ok( _userCreated);
         }
 
         [Route("getAllUser")]
@@ -38,5 +45,21 @@ namespace Controllers
         {
         return await _context.Users.ToListAsync();
         }
+
+
+        //move to other component after finish  
+        public async Task<bool> CheckIfUserExist(User user)
+        {
+            var _checkedUser = await _context.Users.FindAsync(user);
+
+            if(_checkedUser != null)
+            {
+                return true;
+            }
+
+            return false;
+
+        }
+        
     }
 }
