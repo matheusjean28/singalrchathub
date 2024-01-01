@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserContext;
@@ -50,14 +51,8 @@ namespace Controllers
         //move to other component after finish  
         public async Task<bool> CheckIfUserExist(User user)
         {
-            var _checkedUser = await _context.Users.FindAsync(user);
-
-            if(_checkedUser != null)
-            {
-                return true;
-            }
-
-            return false;
+            
+              return await _context.Users.AnyAsync(u => u.UserName == user.UserName);
 
         }
         
