@@ -47,13 +47,30 @@ namespace Controllers
         return await _context.Users.ToListAsync();
         }
 
+        [Route("Auth")]
+        [HttpPost]
+        public async Task<IActionResult> Auth(User user)
+        {   
+            var _searchedUser = await _context.Users.AnyAsync(u => u.UserName == user.UserName); 
+            Debug.Print($"_searchedUser: {_searchedUser}");
+
+            if(_searchedUser)
+            {
+            var _userToken = $"{DateTime.Now + user.Id} {user.Id}";
+            Console.WriteLine("User found. Authorized.");
+            return Ok(_userToken);
+            
+            };
+
+            var _notFound = $"{user.UserName} Was not Found, Does it realy exists?";
+            return BadRequest(_notFound);
+        }
+
 
         //move to other component after finish  
         public async Task<bool> CheckIfUserExist(User user)
         {
-            
               return await _context.Users.AnyAsync(u => u.UserName == user.UserName);
-
         }
         
     }
