@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserContext;
 using UserModel;
+using LoginModel;
 
 namespace Controllers
 {
@@ -56,7 +57,9 @@ namespace Controllers
 
             if(_searchedUser)
             {
-            var _userToken = $"{DateTime.Now + user.Id} {user.Id}";
+        var _userToken = new { token = DateTime.Now, Message = "Success" };
+
+
             Console.WriteLine("User found. Authorized.");
             return Ok(_userToken);
             
