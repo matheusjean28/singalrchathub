@@ -7,6 +7,8 @@ namespace ChatModel
     public class Chat
     {
         [Key]
+         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
         public string ChatID { get; set; }
 
         [Required(ErrorMessage = "ChatName is required")]
