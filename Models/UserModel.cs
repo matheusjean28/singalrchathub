@@ -1,6 +1,7 @@
 // UserModel
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Claims;
 
 namespace UserModel
 {
@@ -21,5 +22,7 @@ namespace UserModel
 
         [Required(ErrorMessage = "Gender is required")]
         public string Gener { get; set; }
+
+
     }
 }

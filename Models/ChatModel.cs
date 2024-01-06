@@ -7,7 +7,7 @@ namespace ChatModel
     public class Chat
     {
         [Key]
-         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 
         public string ChatID { get; set; }
 
@@ -17,9 +17,9 @@ namespace ChatModel
         //if not declared, defoult value is "10"
         public int OnlineUser { get; set; } = 10;
 
-        [ForeignKey("User")]
+        [ForeignKey("Owner")]
         public string UserId { get; set; }
 
-        public User User { get; set; }
+        public User Owner { get; set; }
     }
 }

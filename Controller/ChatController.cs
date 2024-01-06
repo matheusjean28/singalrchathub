@@ -1,10 +1,8 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserContext;
 using ChatModel;
 using UserModel;
-using LoginModel;
 
 namespace Controllers
 {
@@ -45,22 +43,35 @@ namespace Controllers
 
 
         [HttpPost("CreateRoom")]
-        public async Task<ActionResult<Chat>> CreateRoom(string ChatName, string Owner, int OnlineUser, string UserId)
+        public async Task<ActionResult<Chat>> CreateRoom(string chatName, int onlineUser, string userId)
         {
-
-            var chatRoom = new Chat
+            try
             {
-                ChatName = ChatName,
-                OnlineUser = OnlineUser,
-                // here need to check if is a valid user id, otherwise will throw an error
-                UserId = "5d8c9046-0c60-4aba-b447-22879a0542cd"
-            };
+                var user = await _context.Users.FindAsync(userId);
 
-            _context.Chats.Add(chatRoom);
-            await _context.SaveChangesAsync();
+                if (user == null)
+                {
+                    return BadRequest($"User with ID {userId} not found.");
+                }
 
-            return chatRoom;
+                var chatRoom = new Chat
+                {
+                    ChatName = chatName,
+                    OnlineUser = onlineUser,
+                    Owner = user
+                };
+
+                _context.Chats.Add(chatRoom);
+                await _context.SaveChangesAsync();
+
+                return Ok(chatRoom);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
         }
+
 
 
     }
