@@ -43,3 +43,10 @@ msbuild.err
 msbuild.wrn
 .bin/
 .obj/
+bin/
+obj/
+*.dll
+*.pdb
+*.cache
+*.editorconfig
+project.assets.json

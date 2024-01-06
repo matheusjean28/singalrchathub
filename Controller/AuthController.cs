@@ -20,7 +20,7 @@ namespace Controllers
         [HttpGet]
         public string GetSomething()
         {
-            return "alguma coisa";
+            return "something";
         }
 
         [Route("CreateUser")]
