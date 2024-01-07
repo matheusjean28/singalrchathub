@@ -23,6 +23,8 @@ namespace UserModel
         [Required(ErrorMessage = "Gender is required")]
         public string Gener { get; set; }
 
+        public string CurrentChatId { get; set; } = string.Empty;
+         public string CurrentConnectionId { get; set; }= string.Empty;
 
     }
 }

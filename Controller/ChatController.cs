@@ -58,10 +58,14 @@ namespace Controllers
                 {
                     ChatName = chatName,
                     OnlineUser = onlineUser,
-                    Owner = user
+                    Owner = user,
+                    Users = new List<User> { user }
                 };
 
                 _context.Chats.Add(chatRoom);
+                await _context.SaveChangesAsync();
+
+                user.CurrentChatId = chatRoom.ChatID;
                 await _context.SaveChangesAsync();
 
                 return Ok(chatRoom);

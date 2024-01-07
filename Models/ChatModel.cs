@@ -21,5 +21,7 @@ namespace ChatModel
         public string UserId { get; set; }
 
         public User Owner { get; set; }
+
+        public List<User> Users { get; set; }
     }
 }
