@@ -21,6 +21,7 @@ builder.Services.AddDbContext<UserDbContext>(options =>
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
+builder.Services.AddScoped<ChatHubServices.ChatService>();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -47,5 +48,6 @@ app.UseCors("CorsPolicy");
 app.MapControllers();
 
 app.MapHub<ChatHub>("/chatHub");
+
 
 await app.RunAsync();
