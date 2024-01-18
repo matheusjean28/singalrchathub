@@ -52,21 +52,31 @@ namespace Controllers
         [HttpPost]
         public async Task<IActionResult> Auth(User user)
         {
-            var _searchedUser = await _context.Users.AnyAsync(u => u.UserName == user.UserName);
+            try
+            {
+            var _searchedUser = await _context.Users.FirstOrDefaultAsync(u => u.UserName == user.UserName);
+
             Debug.Print($"_searchedUser: {_searchedUser}");
 
-            if (_searchedUser)
+            if (_searchedUser  != null)
             {
                 var _userToken = new { token = DateTime.Now, Message = "Success" };
 
 
                 Console.WriteLine("User found. Authorized.");
-                return Ok(_userToken);
+                return Ok(_searchedUser);
 
             };
 
             var _notFound = $"{user.UserName} Was not Found, Does it realy exists?";
-            return BadRequest(_notFound);
+            return BadRequest("_notFound");
+
+            }
+            catch (Exception ex) 
+            {
+                Console.WriteLine("Error:", ex.Message);
+                return BadRequest("An error occurred during authentication."); 
+            }
         }
 
 

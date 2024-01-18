@@ -103,6 +103,13 @@ C:\dev\singalrchathub\obj\Debug\net7.0\refint\ChatSignalR.dll
 C:\dev\singalrchathub\obj\Debug\net7.0\ChatSignalR.pdb
 C:\dev\singalrchathub\obj\Debug\net7.0\ChatSignalR.genruntimeconfig.cache
 C:\dev\singalrchathub\obj\Debug\net7.0\ref\ChatSignalR.dll
+C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.csproj.AssemblyReference.cache
+C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.GeneratedMSBuildEditorConfig.editorconfig
+C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.AssemblyInfoInputs.cache
+C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.AssemblyInfo.cs
+C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.csproj.CoreCompileInputs.cache
+C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.MvcApplicationPartsAssemblyInfo.cs
+C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.MvcApplicationPartsAssemblyInfo.cache
 C:\Dev\ChatSignalR\bin\Debug\net7.0\appsettings.Development.json
 C:\Dev\ChatSignalR\bin\Debug\net7.0\appsettings.json
 C:\Dev\ChatSignalR\bin\Debug\net7.0\ChatSignalR.exe
@@ -187,13 +194,6 @@ C:\Dev\ChatSignalR\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\System.Drawin
 C:\Dev\ChatSignalR\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
 C:\Dev\ChatSignalR\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
 C:\Dev\ChatSignalR\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
-C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.csproj.AssemblyReference.cache
-C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.GeneratedMSBuildEditorConfig.editorconfig
-C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.AssemblyInfoInputs.cache
-C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.AssemblyInfo.cs
-C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.csproj.CoreCompileInputs.cache
-C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.MvcApplicationPartsAssemblyInfo.cs
-C:\Dev\ChatSignalR\obj\Debug\net7.0\ChatSignalR.MvcApplicationPartsAssemblyInfo.cache
 C:\Dev\ChatSignalR\obj\Debug\net7.0\staticwebassets\msbuild.ChatSignalR.Microsoft.AspNetCore.StaticWebAssets.props
 C:\Dev\ChatSignalR\obj\Debug\net7.0\staticwebassets\msbuild.build.ChatSignalR.props
 C:\Dev\ChatSignalR\obj\Debug\net7.0\staticwebassets\msbuild.buildMultiTargeting.ChatSignalR.props

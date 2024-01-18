@@ -15,24 +15,6 @@ namespace Controllers
             _context = context;
         }
 
-        // [Route("GetRooms")]
-        // [HttpGet]
-        // public async Task IActionResult<Chat> GetAvaliableChats()
-        // {
-
-        // }
-        // [Route("GetRooms")]
-        // [HttpGet]
-        // public List<Chat> List()
-        // {
-        //     List<Chat> rooms = new List<Chat>
-        //     {
-        //         new Chat {
-        //             ChatID= "12asd1d5",ChatName = "room1", OnlineUser = 10, UserId= "1a2ds"},
-        //     };
-
-        //     return rooms;
-        // }
 
         [HttpGet("GetAllRooms")]
         public async Task<ActionResult<List<Chat>>> GetAllRooms()
