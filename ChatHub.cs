@@ -5,33 +5,37 @@ using System.Threading.Tasks;
 namespace ChatHubChat
 {
     public class ChatHub : Hub
-    {
-        private readonly ChatService _chatService;
-
-        public ChatHub(ChatService chatService)
-        {
-            _chatService = chatService;
-        }
-
-        public async Task EnviarMensagem(string usuario, string mensagem)
-        {
-            await Clients.All.SendAsync("ReceberMensagem", usuario, mensagem);
-        }
-
-        public async Task ReceberMensagem(string usuario, string mensagem)
-        {
-            await Clients.All.SendAsync("ReceberMensagem", usuario, mensagem);
-        }
-
-public async Task JoinChat(string userId, string chatId)
 {
-    await Groups.AddToGroupAsync(Context.ConnectionId, chatId);
+    private readonly ChatService _chatService;
+    private const string ReceiveMessageMethod = "ReceberMensagem";
+    private const string UpdateUsersInChatMethod = "UpdateUsersInChat";
 
-    var usersInChat = _chatService.GetUsersInChat(chatId);
-    await Clients.Group(chatId).SendAsync("UpdateUsersInChat", usersInChat);
+    public ChatHub(ChatService chatService)
+    {
+        _chatService = chatService;
+    }
 
-    await Clients.Group(chatId).SendAsync("ReceiveMessage", $"{userId} joined the chat");
+    [HubMethodName("SendMessageToUser")]
+    public async Task SendMessageToUser(string usuario, string mensagem, string chatId)
+    {
+        await Clients.Groups(chatId).SendAsync(ReceiveMessageMethod, usuario, mensagem);
+    }
+
+
+    public async Task JoinChat(string userId, string chatId)
+    {
+         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(chatId))
+    {
+        await Clients.Caller.SendAsync("ErrorMessage", "Invalid userId or chatId");
+        return ;
+    }
+        await Groups.AddToGroupAsync(Context.ConnectionId, chatId);
+
+        var usersInChat = _chatService.GetUsersInChat(chatId);
+        await Clients.Group(chatId).SendAsync(UpdateUsersInChatMethod, usersInChat);
+
+        await Clients.Group(chatId).SendAsync(ReceiveMessageMethod, $"{userId} joined the chat");
+    }
 }
 
-    }
 }
