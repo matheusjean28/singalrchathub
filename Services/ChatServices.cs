@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.Intrinsics.Arm;
 using UserModel;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace ChatHubServices
 {
@@ -15,11 +16,13 @@ namespace ChatHubServices
     {
         private readonly UserDbContext _context;
         private readonly IHubContext<ChatHub> _hubContext;
+        private readonly ILogger _logger;
 
-        public ChatService(UserDbContext context, IHubContext<ChatHub> hubContext)
+        public ChatService(UserDbContext context, IHubContext<ChatHub> hubContext, ILogger<ChatService> logger)
         {
             _context = context;
             _hubContext = hubContext;
+            _logger = logger;
         }
 
 
@@ -28,16 +31,18 @@ namespace ChatHubServices
         {
             try
             {
-                var chat = await _context.Chats
-                    .Include(c => c.Users)
-                    .FirstOrDefaultAsync(c => c.ChatID == chatId);
+            var _chatUsers = await _context.Chats
+            .Include(c => c.Users)
+            .FirstOrDefaultAsync(c => c.ChatID == chatId);
+               
+            if (_chatUsers == null)
+            {
+                return NotFound($"Chat with ID {chatId} not found.");
+            }   
+            var usersInChat = _chatUsers.Users.ToList();
+            var loggerParams = string.Join(", ", usersInChat.Select(u => u.Id));
+            _logger.LogInformation($"Users in Chat {chatId}: {loggerParams}");
 
-                if (chat == null)
-                {
-                    return NotFound($"Chat with ID {chatId} not found.");
-                }
-
-                var usersInChat = chat.Users.ToList();
                 return Ok(usersInChat);
             }
             catch (Exception ex)

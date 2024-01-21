@@ -15,7 +15,6 @@ namespace Controllers
             _context = context;
         }
 
-
         [HttpGet("GetAllRooms")]
         public async Task<ActionResult<List<Chat>>> GetAllRooms()
         {
@@ -50,13 +49,48 @@ namespace Controllers
                 user.CurrentChatId = chatRoom.ChatID;
                 await _context.SaveChangesAsync();
 
+                var _responseCreatedChat = $"Chat was Created with sucess!: {chatRoom}";
+
                 return Ok(chatRoom);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
-            }
+            };
         }
+
+       [HttpDelete("Delete")]
+public async Task<ActionResult> DeleteRoom(string userId, string chat)
+{
+    try
+    {
+        var user = await _context.Users.FindAsync("5d8c9046-0c60-4aba-b447-22879a0542cd");
+        
+        if (user == null)
+        {
+            var userNotFoundMessage = $"UserId {userId} was not found. It is not possible to delete a room for a non-existent user.";
+            return NotFound(userNotFoundMessage);
+        }
+
+        var roomToDelete = await _context.Chats.FindAsync(chat);
+
+        if (roomToDelete == null)
+        {
+            var roomNotFoundMessage = $"Chat {chat} was not found. Room not deleted.";
+            return NotFound(roomNotFoundMessage);
+        }
+
+        _context.Chats.Remove(roomToDelete);
+        await _context.SaveChangesAsync();
+
+        return Ok("Room deleted successfully.");
+    }
+    catch (Exception ex)
+    {
+        var errorMessage = $"An error occurred: {ex.Message}";
+        return BadRequest(errorMessage);
+    }
+}
 
 
 

@@ -22,6 +22,7 @@ namespace ChatModel
 
         public User Owner { get; set; }
 
-        public List<User> Users { get; set; }
+         [ForeignKey("UserId")]
+        public virtual ICollection<User> Users { get; set; }
     }
 }
