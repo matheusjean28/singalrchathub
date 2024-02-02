@@ -51,6 +51,18 @@ namespace ChatHubServices
             }
         }
 
+        [HttpGet("/UserIsAuthorizate")]
+        public bool UserIsAuthorizate( string chatToken)
+        {
+            //check if token is null
+            if( chatToken == "" )
+            {
+                return false;
+            };  
+            //create a table at database and save this temp token, check if that is valid
+            return true;
+        }
+
 
     }
 }

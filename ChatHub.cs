@@ -1,57 +1,43 @@
-using ChatHubServices;
-using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
+    using ChatHubServices;
+    using Microsoft.AspNetCore.SignalR;
+    using System.Threading.Tasks;
 
-namespace ChatHubChat
-{
-    public class ChatHub : Hub
-{
-    private readonly ChatService _chatService;
+    namespace ChatHubChat
+    {
+        public class ChatHub : Hub
+    {
+        private readonly ChatService _chatService;
 
-    public ChatHub(ChatService chatService)
-    {
-        _chatService = chatService;
-    }
-
-    public async Task SendMessageToUser(string userId ,string user, string message,string chatId)
-    {
-    try
-    {
-        await Groups.AddToGroupAsync(userId, chatId);
-        await Clients.All.SendAsync("SendMessageToUser", user, message);
-    }
-    catch (Exception ex)
-    {
-        Console.Error.WriteLine($"Error: {ex.Message}");
-        await Clients.Caller.SendAsync("ErrorMessage", $"Failed to send message: {ex.Message}");
-    }
-    }
-
-     public async Task ReciveMessage(string name, string message)
+        public ChatHub(ChatService chatService)
         {
-            await Clients.All.SendAsync("reciveMessage", name, message);
+            _chatService = chatService;
+        }
+
+    public async Task SendMessageToGroup (string UserId, string ChatId, string UserMessage, string ChatToken)
+    {
+        try
+        {
+         if(_chatService.UserIsAuthorizate(ChatToken))
+         {
+        await Clients.Caller.SendAsync("SendMessageToGroup", "Message sent successfully");
+
+        await Clients.All.SendAsync("ReciveMessage" ,UserMessage);
+
+         }
+         else
+         {
+            await Clients.Caller.SendAsync("Error", "Username not Allow at this Chat");
+         }
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine(error);
+
+            await Clients.Caller.SendAsync("Error", error);
         }
 
 
+    }
 
-       public async Task JoinChat(string userId, string chatId)
-            {
-            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(chatId))
-            {
-                await Clients.Caller.SendAsync("ErrorMessage", "Invalid userId or chatId");
-                return;
-            }
-
-            await Groups.AddToGroupAsync(userId, chatId);
-
-            await Clients.Group(chatId).SendAsync("SendMessageToUser", $"{userId} joined the chat");
-
-            var usersInChat = _chatService.GetUsersInChat(chatId);
-            await Clients.Group(chatId).SendAsync("UpdateUsersInChatMethod", usersInChat);
-            }
-
-
-    
-}
-
-}
+    }
+    }
