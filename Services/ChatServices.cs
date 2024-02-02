@@ -63,6 +63,27 @@ namespace ChatHubServices
             return true;
         }
 
+       [HttpGet("/CheckUserCredentialsBeforeJoin")]
+        public async Task<string> CheckUserCredentialsBeforeJoin(string UserId, string ChatId)
+        {
+            var user = await _context.Users.FindAsync(UserId);
+
+            if (user == null)
+            {
+            return "UserID Not Found";
+            }
+
+            var chat = await _context.Chats.FindAsync(ChatId);
+
+            if (chat == null)
+            {
+            return "ChatID Not Found";
+            }
+
+            return "OK";
+            }
+
+
 
     }
 }

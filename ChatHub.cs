@@ -1,4 +1,6 @@
     using ChatHubServices;
+    
+    using MessageModel;
     using Microsoft.AspNetCore.SignalR;
     using System.Threading.Tasks;
 
@@ -12,32 +14,60 @@
         {
             _chatService = chatService;
         }
+        private Dictionary<string, string> userConnections = new Dictionary<string, string>();
 
-    public async Task SendMessageToGroup (string UserId, string ChatId, string UserMessage, string ChatToken)
-    {
-        try
+        //send a req to join at chat
+        public async Task JoinChat(string UserId, string ChatId)
         {
-         if(_chatService.UserIsAuthorizate(ChatToken))
-         {
-        await Clients.Caller.SendAsync("SendMessageToGroup", "Message sent successfully");
-
-        await Clients.All.SendAsync("ReciveMessage" ,UserMessage);
-
-         }
-         else
-         {
-            await Clients.Caller.SendAsync("Error", "Username not Allow at this Chat");
-         }
+            try
+            {
+                if(string.IsNullOrEmpty(UserId) || string.IsNullOrEmpty(ChatId) )
+                {
+                await Clients.Caller.SendAsync("Error", "UserID or ChatID is invalid");
+                }else 
+                {
+                var _joinMessage = await _chatService.CheckUserCredentialsBeforeJoin(UserId, ChatId);
+                if( _joinMessage == "OK")
+                {
+                    userConnections[UserId] = Context.ConnectionId;
+                    await Groups.AddToGroupAsync(Context.ConnectionId, ChatId);
+                    await Clients.Caller.SendAsync("JoinChat", "Joined With Sucess!");
+                }
+                else 
+                {
+                    await Clients.Caller.SendAsync("Error", _joinMessage  );
+                }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                await Clients.Caller.SendAsync("Error", ex);
+            }
         }
-        catch (Exception error)
-        {
-            Console.WriteLine(error);
-
-            await Clients.Caller.SendAsync("Error", error);
-        }
 
 
-    }
+            public async Task SendMessageToGroup(string UserId, string ChatId, Object UserMessage, string ChatToken)
+            {
+                try
+                {
+                    if (_chatService.UserIsAuthorizate(ChatToken))
+                    {
+                        await Clients.Caller.SendAsync("SendMessageToGroup", "Message sent successfully");
+                        await Clients.Groups(ChatId).SendAsync("ReceiveMessage", UserMessage);
+                    }
+                    else
+                    {
+                        await Clients.Caller.SendAsync("Error", "Username not allowed in this Chat");
+                    }
+                }
+                catch (Exception error)
+                {
+                    Console.WriteLine(error);
+                    await Clients.Caller.SendAsync("Error", "An error occurred");
+                }
+            }
+
 
     }
     }
