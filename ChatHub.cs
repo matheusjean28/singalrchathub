@@ -1,5 +1,6 @@
     using ChatHubServices;
-    
+    using System;
+    using System.Text.RegularExpressions;    
     using MessageModel;
     using Microsoft.AspNetCore.SignalR;
     using System.Threading.Tasks;
@@ -47,14 +48,25 @@
         }
 
 
-            public async Task SendMessageToGroup(string UserId, string ChatId, Object UserMessage, string ChatToken)
+            public async Task SendMessageToGroup(string UserId, string ChatId, string Username, string UserMessage, string ChatToken)
             {
                 try
                 {
                     if (_chatService.UserIsAuthorizate(ChatToken))
                     {
+                        
+                        if(  IsValidMessage(UserMessage))
+                        {
+                        var _formatMessageToSend = new [] {new { User = Username, Message = UserMessage }};
+                        
                         await Clients.Caller.SendAsync("SendMessageToGroup", "Message sent successfully");
-                        await Clients.Groups(ChatId).SendAsync("ReceiveMessage", UserMessage);
+                        await Clients.Groups(ChatId).SendAsync("ReceiveMessage", _formatMessageToSend);
+                        }
+                        else 
+                        {
+                        await Clients.Caller.SendAsync("Error", "Message Cant be Empty");
+                        }
+
                     }
                     else
                     {
@@ -69,5 +81,42 @@
             }
 
 
-    }
+            
+              //broken this functions at another component before......  
+             public static bool IsValidMessage(string UserMessage)
+             {
+               return RegexStringMessage(UserMessage) != "String Null or Empty";
+             }
+
+             
+             public static string RegexStringMessage(string UserMessage)
+                {
+                try
+                {
+                //check if string is null before start regex
+                if (string.IsNullOrEmpty(UserMessage))
+                {
+                    return "String Null or Empty";
+                }
+
+                else
+                {
+                    string pattern = @"^[\p{L}\p{M}.,!\/\s]*$";
+                    string placeReplace = "";
+                    Regex regex = new Regex(pattern);
+
+                    var _regexReturn = regex.Replace(UserMessage, placeReplace);
+
+                return _regexReturn;
+                    }
+                }
+                catch (Exception ex)
+                {
+                Console.WriteLine("some error ocurred here" +ex );
+                return "Regex Error: " + ex.Message;
+                }
+                }
+            
+                }
+
     }

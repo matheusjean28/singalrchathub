@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using UserContext;
 using ChatModel;
 using UserModel;
+using ChatBody;
 
 namespace Controllers
 {
@@ -24,21 +25,21 @@ namespace Controllers
 
 
         [HttpPost("CreateRoom")]
-        public async Task<ActionResult<Chat>> CreateRoom(string chatName, int onlineUser, string userId)
+        public async Task<ActionResult<CreateRoomModel>> CreateRoom([FromBody] CreateRoomModel model)
         {
             try
             {
-                var user = await _context.Users.FindAsync(userId);
+                var user = await _context.Users.FindAsync(model.UserId);
 
                 if (user == null)
                 {
-                    return BadRequest($"User with ID {userId} not found.");
+                    return BadRequest($"User with ID {model.UserId} not found.");
                 }
-
+            
                 var chatRoom = new Chat
                 {
-                    ChatName = chatName,
-                    OnlineUser = onlineUser,
+                    ChatName = model.ChatName,
+                    OnlineUser = model.OnlineUser,
                     Owner = user,
                     Users = new List<User> { user }
                 };
