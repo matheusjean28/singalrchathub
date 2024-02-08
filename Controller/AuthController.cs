@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserContext;
 using UserModel;
-using LoginModel;
-
+using UserIndoDTO;
+using UserLoginModel;
 namespace Controllers
 {
     public class AuthController : ControllerBase
@@ -25,9 +25,8 @@ namespace Controllers
 
         [Route("CreateUser")]
         [HttpPost]
-        public async Task<ActionResult<User>> CreateUser(User user)
-        {
-
+        public async Task<ActionResult<User>> CreateUser([FromBody]User user)
+        {   
             if (await CheckIfUserExist(user))
             {
                 var _userAlreadyExist = $"{user.UserName} Already exist";
@@ -37,8 +36,16 @@ namespace Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            var _userCreated = $"{user.UserName} was created with sucess!";
-            return Ok(_userCreated);
+            var _responseCreateUserOk = new UserDTO
+                {   
+                    Id = user.Id,
+                    UserName= user.UserName,
+                    Email= user.Email,
+                    Token= null
+                };
+
+            // var _userCreated = $"User Created With Sucess" {_responseCreateUserOk};
+            return Ok(_responseCreateUserOk);
         }
 
         [Route("getAllUser")]
@@ -48,28 +55,35 @@ namespace Controllers
             return await _context.Users.ToListAsync();
         }
 
+
+        //check other params also, 
+        //return DTO that contains name, userId, gender only
         [Route("Auth")]
         [HttpPost]
-        public async Task<IActionResult> Auth(User user)
+        public async Task<IActionResult> Auth([FromBody]UserLogin user)
         {
             try
             {
             var _searchedUser = await _context.Users.FirstOrDefaultAsync(u => u.UserName == user.UserName);
 
-            Debug.Print($"_searchedUser: {_searchedUser}");
-
             if (_searchedUser  != null)
             {
-                var _userToken = new { token = DateTime.Now, Message = "Success" };
-
-
-                Console.WriteLine("User found. Authorized.");
-                return Ok(_searchedUser);
+                var _userToken = new { token = DateTime.Now };
+               
+                var _responseAuthUserOk = new UserDTO
+                {   
+                    Id = _searchedUser.Id,
+                    UserName= _searchedUser.UserName,
+                    Email= _searchedUser.Email,
+                    Token= _userToken
+                };
+                
+                return Ok(_responseAuthUserOk);
 
             };
 
             var _notFound = $"{user.UserName} Was not Found, Does it realy exists?";
-            return BadRequest("_notFound");
+            return NotFound("_notFound");
 
             }
             catch (Exception ex) 
@@ -85,6 +99,7 @@ namespace Controllers
         {
             return await _context.Users.AnyAsync(u => u.UserName == user.UserName);
         }
-
     }
 }
+
+    
