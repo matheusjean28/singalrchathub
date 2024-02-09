@@ -5,23 +5,24 @@ using UserContext;
 using UserModel;
 using UserLoginDTO;
 using UserLoginModel;
+using AuthServiceJwt;
+
+
+
 namespace Controllers
 {
     public class AuthController : ControllerBase
     {
         private readonly UserDbContext _context;
+        private readonly AuthService _authJwt;
 
-        public AuthController(UserDbContext context)
+        public AuthController(UserDbContext context, AuthService authJwt)
         {
             _context = context;
+            _authJwt  = authJwt;
         }
 
-        [Route("getsomething")]
-        [HttpGet]
-        public string GetSomething()
-        {
-            return "something";
-        }
+      
 
         [Route("CreateUser")]
         [HttpPost]
@@ -72,7 +73,10 @@ namespace Controllers
 
             if (_searchedUser  != null)
             {
-                var _userToken = new { token = DateTime.Now };
+                if( IsValidPassword(_searchedUser.Pass, user.Password))
+                {
+
+                var _userToken = new { token = _authJwt.GenerateJwtToken(_searchedUser) };
                
                 var _responseAuthUserOk = new UserDTO
                 {   
@@ -83,7 +87,10 @@ namespace Controllers
                 };
                 
                 return Ok(_responseAuthUserOk);
-
+                }
+                else {
+                    return BadRequest("Wrong Password!");
+                }
             };
 
             var _notFound = $"{user.UserName} Was not Found, Does it realy exists?";
@@ -92,6 +99,7 @@ namespace Controllers
             }
             catch (Exception ex) 
             {
+                Console.WriteLine($"Error: {ex}");
                 Console.WriteLine("Error:", ex.Message);
                 return BadRequest("An error occurred during authentication."); 
             }
@@ -102,6 +110,12 @@ namespace Controllers
         public async Task<bool> CheckIfUserExist(User user)
         {
             return await _context.Users.AnyAsync(u => u.UserName == user.UserName);
+        }
+
+        public bool IsValidPassword(string paswordFromParams,  string passwordFromDb)
+        {
+            var isEqualPass = passwordFromDb.Trim().Equals(paswordFromParams.Trim());
+            return isEqualPass;
         }
     }
 }

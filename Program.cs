@@ -1,10 +1,23 @@
+using UserContext;
 using Microsoft.Data.Sqlite;
 using Microsoft.OpenApi.Models;
 using ChatHubChat;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
-using UserContext;
+//to add jwt
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+
+using AuthServiceJwt;
+
 var builder = WebApplication.CreateBuilder(args);
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(builder.Environment.ContentRootPath)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .Build();
 
 builder.Services.AddCors(options =>
 {
@@ -18,7 +31,22 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite")));
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = configuration["jwt:issuer"],
+            ValidAudience = configuration["jwt:audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["jwt:secreteKey"]))
+        };
+    });
 
+builder.Services.AddScoped<AuthService>(); 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
 builder.Services.AddScoped<ChatHubServices.ChatService>();
@@ -44,6 +72,7 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 
 app.UseCors("CorsPolicy");
+app.UseAuthentication();
 
 app.MapControllers();
 
