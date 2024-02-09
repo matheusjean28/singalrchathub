@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserContext;
 using UserModel;
-using UserIndoDTO;
+using UserLoginDTO;
 using UserLoginModel;
 namespace Controllers
 {
@@ -36,7 +36,7 @@ namespace Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            var _responseCreateUserOk = new UserDTO
+            var CreateUserOk = new UserDTO
                 {   
                     Id = user.Id,
                     UserName= user.UserName,
@@ -44,8 +44,12 @@ namespace Controllers
                     Token= null
                 };
 
-            // var _userCreated = $"User Created With Sucess" {_responseCreateUserOk};
-            return Ok(_responseCreateUserOk);
+            Object messageResponse = new {Message ="User Created With success"};
+            var _createdResponse = new {
+                messageResponse,
+                CreateUserOk
+            };
+            return Ok(_createdResponse);
         }
 
         [Route("getAllUser")]

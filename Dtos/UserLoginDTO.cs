@@ -1,5 +1,5 @@
 
-namespace UserIndoDTO
+namespace UserLoginDTO
 {
     public class UserDTO
     {
