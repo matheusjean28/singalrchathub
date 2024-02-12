@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,34 +25,47 @@ namespace Controllers
 
       
 
-        [Route("CreateUser")]
+        [Route("/CreateUser")]
         [HttpPost]
-        public async Task<ActionResult<User>> CreateUser([FromBody]User user)
+        public async Task<ActionResult<User>> CreateUser([FromBody]UserModel.User user)
         {   
-            if (await CheckIfUserExist(user))
-            {
-                var _userAlreadyExist = $"{user.UserName} Already exist";
-                return Conflict(_userAlreadyExist);
-            }
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            var CreateUserOk = new UserDTO
-                {   
-                    Id = user.Id,
-                    UserName= user.UserName,
-                    Email= user.Email,
-                    Token= null
-                };
-
-            Object messageResponse = new {Message ="User Created With success"};
-            var _createdResponse = new {
-                messageResponse,
-                CreateUserOk
-            };
-            return Ok(_createdResponse);
+        try
+        {
+        if (user == null)
+        {
+            return BadRequest("Unexpected error occurred");
         }
+
+        if (await CheckIfUserExist(user))
+        {
+            var userAlreadyExistMessage = $"{user.UserName} already exists";
+            return Conflict(userAlreadyExistMessage);
+        }
+
+        var newUser = new User(user.UserName, user.Email, user.Pass, user.Gener);
+
+        _context.Users.Add(newUser);
+        await _context.SaveChangesAsync();
+        
+        var authToken = await _authJwt.GenerateJwtToken(user.UserName);
+
+        var response = new
+        {
+            id = newUser.Id,
+            userName = newUser.UserName,
+            email = newUser.Email,
+            token = new { token = authToken }
+        };
+
+        return Ok(response);
+        }
+        catch (Exception ex)
+        {
+        Console.WriteLine(ex);
+        return BadRequest("An error occurred during account creation."); 
+        }
+        }
+
 
         [Route("getAllUser")]
         [HttpGet]
@@ -76,7 +90,7 @@ namespace Controllers
                 if( IsValidPassword(_searchedUser.Pass, user.Password))
                 {
 
-                var _userToken = new { token = _authJwt.GenerateJwtToken(_searchedUser) };
+                var _userToken = new { token = await _authJwt.GenerateJwtToken(user.UserName) };
                
                 var _responseAuthUserOk = new UserDTO
                 {   
@@ -109,7 +123,16 @@ namespace Controllers
         //move to other component after finish  
         public async Task<bool> CheckIfUserExist(User user)
         {
-            return await _context.Users.AnyAsync(u => u.UserName == user.UserName);
+            var userNameExist = await _context.Users.AnyAsync(u => 
+            u.UserName == user.UserName );
+            var userEmailExist = await _context.Users.AnyAsync(u => 
+            u.Email == user.Email );
+            
+            if(userNameExist && userEmailExist){
+                return true;
+            }
+            return false;
+
         }
 
         public bool IsValidPassword(string paswordFromParams,  string passwordFromDb)

@@ -30,6 +30,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddDbContext<UserDbContext>(options =>
+
     options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite")));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -53,7 +54,7 @@ builder.Services.AddScoped<ChatHubServices.ChatService>();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "DotNetWebSocketChat", Version = "v1" });
+    c.SwaggerDoc("v2", new OpenApiInfo { Title = "Chat with SinalR and .Net7", Version = "v2" , Description = "AppChat made with signalR, allow create chat-rooms, auth users using JWTBearer token, join chats, and in next features send medias at each chat that current user is in."});
 });
 
 var app = builder.Build();
@@ -64,7 +65,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "DotNetWebSocketChat");
+        c.SwaggerEndpoint("/swagger/v2/swagger.json", "SignalR Chat ");
         c.RoutePrefix = string.Empty;
     });
 }

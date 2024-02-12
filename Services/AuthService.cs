@@ -3,30 +3,35 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UserModel;
-
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Threading.Tasks; 
 
 namespace AuthServiceJwt
 {
-public class AuthService{
+    public class AuthService
+    {
+        private readonly IConfiguration _configuration;
 
-          private readonly IConfiguration _configuration;
-
-            public AuthService(IConfiguration configuration)
+        public AuthService(IConfiguration configuration)
         {
-        _configuration = configuration;
+            _configuration = configuration;
         }
 
-        public string GenerateJwtToken(User searchedUser)
+        public async Task<string> GenerateJwtToken(string UserName) 
         {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwt:secreteKey"]));
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            try
+            {
 
-        var claims = new[]
-        {
-        new Claim(ClaimTypes.Name, searchedUser.UserName),
-        };
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwt:secreteKey"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var token = new JwtSecurityToken(
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, UserName),
+            };
+
+            var token = new JwtSecurityToken(
                 _configuration["jwt:issuer"],
                 _configuration["jwt:audience"],
                 claims,
@@ -34,8 +39,13 @@ public class AuthService{
                 signingCredentials: credentials
             );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            return await Task.FromResult(new JwtSecurityTokenHandler().WriteToken(token)); 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
         }
- 
-}
+    }
 }
