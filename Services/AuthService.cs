@@ -1,11 +1,10 @@
 using Microsoft.Extensions.Logging;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using UserModel;
 using Microsoft.Extensions.Configuration;
-using System;
+using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks; 
 
 namespace AuthServiceJwt
@@ -24,29 +23,54 @@ namespace AuthServiceJwt
         {
             try
             {
-            _logger.LogInformation("UserName inside authservice is this Here Is :" + UserName);
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwt:secreteKey"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+                _logger.LogInformation("UserName inside authservice is this Here Is :" + UserName);
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwt:secreteKey"]));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.Name, UserName),
-            };
+                var claims = new[]
+                {
+                    new Claim(ClaimTypes.Name, UserName),
+                };
 
-            var token = new JwtSecurityToken(
-                _configuration["jwt:issuer"],
-                _configuration["jwt:audience"],
-                claims,
-                expires: DateTime.Now.AddHours(1),
-                signingCredentials: credentials
-            );
-              var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-       _logger.LogInformation("Generated JWT token: " + jwtToken);
-            return await Task.FromResult(jwtToken); 
+                var token = new JwtSecurityToken(
+                    _configuration["jwt:issuer"],
+                    _configuration["jwt:audience"],
+                    claims,
+                    expires: DateTime.Now.AddHours(1),
+                    signingCredentials: credentials
+                );
+                var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
+                _logger.LogInformation("Generated JWT token: " + jwtToken);
+                return await Task.FromResult(jwtToken); 
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                _logger.LogError("Error generating JWT token: " + ex.Message);
+                return null;
+            }
+        }
+
+        public ClaimsPrincipal ValidateToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = _configuration["jwt:issuer"],
+                    ValidAudience = _configuration["jwt:audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwt:secreteKey"])),
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                SecurityToken validatedToken;
+                return tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
+            }
+            catch (Exception ex)
+            {
                 return null;
             }
         }

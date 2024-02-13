@@ -23,16 +23,16 @@ namespace Controllers
             _logger = logger;
         }
         
-        [Authorize]
+         [Authorize(Policy = "Bearer")]
         [HttpGet("GetAllRooms")]
         public async Task<ActionResult<List<Chat>>> GetAllRooms([FromHeader] string authorization)
         {
-            _logger.LogInformation(authorization);
             var allRooms = await _context.Chats.ToListAsync();
             return Ok(allRooms);
         }
 
-        [Authorize]
+                
+        [Authorize(Policy = "Bearer")]
         [HttpPost("CreateRoom")]
         public async Task<ActionResult<CreateRoomModel>> CreateRoom([FromBody] CreateRoomModel model)
         {
@@ -78,7 +78,7 @@ namespace Controllers
             };
                 }
 
-            [Authorize]
+            [Authorize(Policy = "Bearer")]
             [HttpDelete("Delete")]
                 public async Task<ActionResult> DeleteRoom(string userId, string chat)
                 {

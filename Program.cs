@@ -40,6 +40,7 @@ builder.Services.AddDbContext<UserDbContext>(options =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -48,10 +49,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = configuration["jwt:issuer"],
             ValidAudience = configuration["jwt:audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["jwt:secreteKey"])),
-
         };
     });
 
+builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("Bearer", policy =>
+            {
+                policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+                policy.RequireAuthenticatedUser();
+            });
+        });
 builder.Services.AddScoped<AuthService>(); 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
