@@ -2,28 +2,29 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
+
 using UserContext;
 using UserModel;
 using UserLoginDTO;
 using UserLoginModel;
 using AuthServiceJwt;
 
-
-
-namespace Controllers
+namespace AuthControllerMethod
 {
     public class AuthController : ControllerBase
     {
+        private readonly ILogger _logger;
         private readonly UserDbContext _context;
         private readonly AuthService _authJwt;
 
-        public AuthController(UserDbContext context, AuthService authJwt)
+        public AuthController(UserDbContext context, AuthService authJwt, ILogger<UserModel.User> logger)
         {
             _context = context;
             _authJwt  = authJwt;
+            _logger = logger;
         }
-
-      
 
         [Route("/CreateUser")]
         [HttpPost]
@@ -46,7 +47,7 @@ namespace Controllers
 
         _context.Users.Add(newUser);
         await _context.SaveChangesAsync();
-        
+        _logger.LogInformation("UserName inside authcontroller is this Here Is" + user.UserName);
         var authToken = await _authJwt.GenerateJwtToken(user.UserName);
 
         var response = new
@@ -66,7 +67,7 @@ namespace Controllers
         }
         }
 
-
+        [Authorize]
         [Route("getAllUser")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()

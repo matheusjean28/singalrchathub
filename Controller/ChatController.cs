@@ -1,5 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
+
+
 using UserContext;
 using ChatModel;
 using UserModel;
@@ -11,20 +15,24 @@ namespace Controllers
     public class ChatController : ControllerBase
     {
         private readonly UserDbContext _context;
+        private readonly ILogger _logger;
 
-        public ChatController(UserDbContext context)
+        public ChatController(UserDbContext context, ILogger<ChatController> logger)
         {
             _context = context;
+            _logger = logger;
         }
-
+        
+        [Authorize]
         [HttpGet("GetAllRooms")]
-        public async Task<ActionResult<List<Chat>>> GetAllRooms()
+        public async Task<ActionResult<List<Chat>>> GetAllRooms([FromHeader] string authorization)
         {
+            _logger.LogInformation(authorization);
             var allRooms = await _context.Chats.ToListAsync();
             return Ok(allRooms);
         }
 
-
+        [Authorize]
         [HttpPost("CreateRoom")]
         public async Task<ActionResult<CreateRoomModel>> CreateRoom([FromBody] CreateRoomModel model)
         {
@@ -70,7 +78,7 @@ namespace Controllers
             };
                 }
 
-
+            [Authorize]
             [HttpDelete("Delete")]
                 public async Task<ActionResult> DeleteRoom(string userId, string chat)
                 {

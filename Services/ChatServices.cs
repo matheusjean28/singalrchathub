@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using UserContext;
@@ -5,6 +6,7 @@ using ChatHubChat;
 using System.Threading.Tasks;
 using System.Runtime.Intrinsics.Arm;
 using UserModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -25,7 +27,7 @@ namespace ChatHubServices
             _logger = logger;
         }
 
-
+        [Authorize]
         [HttpGet("GetUsersInChat")]
         public async Task<ActionResult<List<User>>> GetUsersInChat(string chatId)
         {
@@ -51,6 +53,7 @@ namespace ChatHubServices
             }
         }
 
+
         [HttpGet("/UserIsAuthorizate")]
         public bool UserIsAuthorizate( string chatToken)
         {
@@ -63,7 +66,8 @@ namespace ChatHubServices
             return true;
         }
 
-       [HttpGet("/CheckUserCredentialsBeforeJoin")]
+        [Authorize]
+        [HttpGet("/CheckUserCredentialsBeforeJoin")]
         public async Task<string> CheckUserCredentialsBeforeJoin(string UserId, string ChatId)
         {
             var user = await _context.Users.FindAsync(UserId);

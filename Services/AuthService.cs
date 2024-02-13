@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
@@ -12,9 +13,10 @@ namespace AuthServiceJwt
     public class AuthService
     {
         private readonly IConfiguration _configuration;
-
-        public AuthService(IConfiguration configuration)
+        private readonly ILogger _logger;
+        public AuthService(IConfiguration configuration, ILogger<AuthService> logger)
         {
+            _logger = logger;
             _configuration = configuration;
         }
 
@@ -22,7 +24,7 @@ namespace AuthServiceJwt
         {
             try
             {
-
+            _logger.LogInformation("UserName inside authservice is this Here Is :" + UserName);
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwt:secreteKey"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -38,8 +40,9 @@ namespace AuthServiceJwt
                 expires: DateTime.Now.AddHours(1),
                 signingCredentials: credentials
             );
-
-            return await Task.FromResult(new JwtSecurityTokenHandler().WriteToken(token)); 
+              var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
+       _logger.LogInformation("Generated JWT token: " + jwtToken);
+            return await Task.FromResult(jwtToken); 
             }
             catch (Exception ex)
             {
