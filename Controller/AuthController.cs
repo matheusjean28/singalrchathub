@@ -107,8 +107,8 @@ namespace AuthControllerMethod
                 }
             };
 
-            var _notFound = $"{user.UserName} Was not Found, Does it realy exists?";
-            return NotFound("_notFound");
+            var _notFound = $"{user.UserName} Was not Found.";
+            return NotFound(_notFound);
 
             }
             catch (Exception ex) 
