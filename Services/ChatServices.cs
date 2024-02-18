@@ -27,7 +27,7 @@ namespace ChatHubServices
             _logger = logger;
         }
 
-        [Authorize]
+        [Authorize(Policy = "Bearer")]
         [HttpGet("GetUsersInChat")]
         public async Task<ActionResult<List<User>>> GetUsersInChat(string chatId)
         {
@@ -66,7 +66,7 @@ namespace ChatHubServices
             return true;
         }
 
-        [Authorize]
+        [Authorize(Policy = "Bearer")]
         [HttpGet("/CheckUserCredentialsBeforeJoin")]
         public async Task<string> CheckUserCredentialsBeforeJoin(string UserId, string ChatId)
         {

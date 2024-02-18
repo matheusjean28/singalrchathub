@@ -47,7 +47,6 @@ namespace AuthControllerMethod
 
         _context.Users.Add(newUser);
         await _context.SaveChangesAsync();
-        _logger.LogInformation("UserName inside authcontroller is this Here Is" + user.UserName);
         var authToken = await _authJwt.GenerateJwtToken(user.UserName);
 
         var response = new
