@@ -27,7 +27,7 @@ namespace ChatHubServices
             _logger = logger;
         }
 
-        [Authorize(Policy = "Bearer")]
+        // [Authorize(Policy = "Bearer")]
         [HttpGet("GetUsersInChat")]
         public async Task<ActionResult<List<User>>> GetUsersInChat(string chatId)
         {

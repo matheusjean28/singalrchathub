@@ -69,7 +69,7 @@ namespace AuthControllerMethod
             }
         }
 
-        [Authorize]
+        // [Authorize]
         [Route("getAllUser")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
