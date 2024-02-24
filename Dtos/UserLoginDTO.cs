@@ -1,3 +1,5 @@
+using ChatSignalR.Models.WrapperChat;
+using UserModel;
 
 namespace UserLoginDTO
 {
@@ -7,7 +9,7 @@ namespace UserLoginDTO
                 public string UserName { get; set; }
                 public string? Email {get;set;}
                 public Object Token {get;set;} = null;
-                
+                public List<WrapperChat> OwnsChatIds { get; set; } = new List<WrapperChat>();
     }
     
 }

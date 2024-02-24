@@ -2,6 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Claims;
+using Enums;
+using ChatModel;
+using ChatSignalR.Models.WrapperChat;
 
 namespace UserModel
 {
@@ -24,15 +27,26 @@ namespace UserModel
         public string Gener { get; set; }
 
         public string? CurrentChatId { get; set; } = string.Empty;
+
         public string? CurrentConnectionId { get; set; }= string.Empty;
 
+        public UserPermissionLevel UserPermissionLevel { get; set; } = UserPermissionLevel.CommonUser;
 
-       public User(string userName, string email, string pass, string? gener)
+        public virtual ICollection<WrapperChat> MyOwnsChatIds { get; set; } = new List<WrapperChat>();
+
+        public User(string userName, string email, string pass, string? gener)
         {
             UserName = userName;
             Email = email;
             Pass = pass;
             Gener = gener;
         }
+
+        //to add a new chat at chat list <ids>
+        public void AddChat(WrapperChat chat)
+        {
+        MyOwnsChatIds.Add(chat);
+        }
+
     }
 }

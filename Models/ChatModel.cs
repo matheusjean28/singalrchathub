@@ -18,11 +18,9 @@ namespace ChatModel
         public int OnlineUser { get; set; } = 10;
 
         [ForeignKey("Owner")]
-        public string UserId { get; set; }
-
+        public string OwnerId { get; set; }
         public User Owner { get; set; }
 
-         [ForeignKey("UserId")]
         public virtual ICollection<User> Users { get; set; }
     }
 }

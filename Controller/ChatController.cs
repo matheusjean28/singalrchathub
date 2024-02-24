@@ -9,6 +9,7 @@ using ChatModel;
 using UserModel;
 using ChatBody;
 using CreateDTO;
+using ChatSignalR.Models.WrapperChat;
 
 namespace Controllers
 {
@@ -23,7 +24,7 @@ namespace Controllers
             _logger = logger;
         }
         
-         [Authorize(Policy = "Bearer")]
+        //  [Authorize(Policy = "Bearer")]
         [HttpGet("GetAllRooms")]
         public async Task<ActionResult<List<Chat>>> GetAllRooms([FromHeader] string authorization)
         {
@@ -32,7 +33,7 @@ namespace Controllers
         }
 
                 
-        [Authorize(Policy = "Bearer")]
+        // [Authorize(Policy = "Bearer")]
         [HttpPost("CreateRoom")]
         public async Task<ActionResult<CreateRoomModel>> CreateRoom([FromBody] CreateRoomModel model)
         {
@@ -66,15 +67,22 @@ namespace Controllers
                     ChatName = chatRoom.ChatName,
                     OnlineUser = chatRoom.OnlineUser,
                     Owner = user.Id,
-
                 };
+                
                 var _responseCreatedChat = $"Chat was Created with sucess!: {_chatDTOresp}";
+
+                var _newWrapperChat = new WrapperChat{
+                   Id= chatRoom.ChatID,
+                    ChatName = chatRoom.ChatName,
+                };
+                user.AddChat(_newWrapperChat);
+                await _context.SaveChangesAsync();
 
                 return Ok(_chatDTOresp);
             }
             catch (Exception ex)
             {
-                return BadRequest($"An error ocurred + {ex}");
+                return BadRequest($"An error occurred: {ex.Message}");
             };
                 }
 

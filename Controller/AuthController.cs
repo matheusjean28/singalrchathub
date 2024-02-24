@@ -9,6 +9,8 @@ using UserContext;
 using UserLoginDTO;
 using UserLoginModel;
 using UserModel;
+using ChatSignalR.Models.WrapperChat;
+
 
 namespace AuthControllerMethod
 {
@@ -31,10 +33,11 @@ namespace AuthControllerMethod
 
         [Route("/CreateUser")]
         [HttpPost]
-        public async Task<ActionResult<User>> CreateUser([FromBody] UserModel.User user)
+        public async Task<ActionResult<User>> CreateUser([FromBody] User user)
         {
             try
             {
+
                 if (user == null)
                 {
                     return BadRequest("Unexpected error occurred");
@@ -65,6 +68,7 @@ namespace AuthControllerMethod
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
+                _logger.LogInformation(ex.Message);
                 return BadRequest("An error occurred during account creation.");
             }
         }
@@ -103,8 +107,12 @@ namespace AuthControllerMethod
                             Id = searchedUser.Id,
                             UserName = searchedUser.UserName,
                             Email = searchedUser.Email,
+                            OwnsChatIds = searchedUser.MyOwnsChatIds.ToList(),
                             Token = userToken
                         };
+
+                        
+                        _logger.LogInformation("{searchedUser}",searchedUser.MyOwnsChatIds);
 
                         return Ok(responseAuthUserOk);
                     }

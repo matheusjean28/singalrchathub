@@ -17,5 +17,14 @@ namespace UserContext
         {
         optionsBuilder.EnableSensitiveDataLogging();
         }
+         protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Chat>()
+            .HasOne(c => c.Owner)            
+            .WithMany()                       
+            .HasForeignKey(c => c.OwnerId);  
+
+        base.OnModelCreating(modelBuilder);
+    }
     }
 }

@@ -1,4 +1,4 @@
-namespace ChatSignalR.Enums
+namespace Enums
 {
     public enum UserPermissionLevel
     {
