@@ -72,12 +72,34 @@ namespace AuthControllerMethod
                 return BadRequest("An error occurred during account creation.");
             }
         }
+        
+      [Route("/GetAllChats")]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<object>>> GetAllChats(string id)
+        {
+            var user = await _context.Users.Include(u => u.MyOwnsChatIds).FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound(); 
+            }
+
+            var chatsOfUser = user.MyOwnsChatIds.Select(c => new
+            {
+                ChatName = c.ChatName, 
+                ChatId = c.Id,
+            }).ToList();
+
+            return chatsOfUser;
+        }
+
 
         // [Authorize]
-        [Route("getAllUser")]
+        [Route("/getAllUser")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
+
             return await _context.Users.ToListAsync();
         }
 

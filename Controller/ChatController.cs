@@ -72,9 +72,10 @@ namespace Controllers
                 var _responseCreatedChat = $"Chat was Created with sucess!: {_chatDTOresp}";
 
                 var _newWrapperChat = new WrapperChat{
-                   Id= chatRoom.ChatID,
-                    ChatName = chatRoom.ChatName,
+                Id= chatRoom.ChatID,
+                ChatName = chatRoom.ChatName,
                 };
+                //take user and add chat wrapper with name and id about that chat
                 user.AddChat(_newWrapperChat);
                 await _context.SaveChangesAsync();
 
