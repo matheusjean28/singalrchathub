@@ -1,11 +1,11 @@
-using Microsoft.Extensions.Logging;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System.Threading.Tasks; 
 
 namespace AuthServiceJwt
 {
@@ -13,24 +13,27 @@ namespace AuthServiceJwt
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
+
         public AuthService(IConfiguration configuration, ILogger<AuthService> logger)
         {
             _logger = logger;
             _configuration = configuration;
         }
 
-        public async Task<string> GenerateJwtToken(string UserName) 
+        public async Task<string> GenerateJwtToken(string UserName)
         {
             try
             {
                 _logger.LogInformation("UserName inside authservice is this Here Is :" + UserName);
-                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwt:secreteKey"]));
-                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+                var securityKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(_configuration["jwt:secreteKey"])
+                );
+                var credentials = new SigningCredentials(
+                    securityKey,
+                    SecurityAlgorithms.HmacSha256
+                );
 
-                var claims = new[]
-                {
-                    new Claim(ClaimTypes.Name, UserName),
-                };
+                var claims = new[] { new Claim(ClaimTypes.Name, UserName), };
 
                 var token = new JwtSecurityToken(
                     _configuration["jwt:issuer"],
@@ -41,7 +44,7 @@ namespace AuthServiceJwt
                 );
                 var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
                 _logger.LogInformation("Generated JWT token: " + jwtToken);
-                return await Task.FromResult(jwtToken); 
+                return await Task.FromResult(jwtToken);
             }
             catch (Exception ex)
             {
@@ -62,7 +65,9 @@ namespace AuthServiceJwt
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = _configuration["jwt:issuer"],
                     ValidAudience = _configuration["jwt:audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwt:secreteKey"])),
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(_configuration["jwt:secreteKey"])
+                    ),
                     ClockSkew = TimeSpan.Zero
                 };
 

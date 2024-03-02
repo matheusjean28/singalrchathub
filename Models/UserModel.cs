@@ -24,10 +24,9 @@ namespace UserModel
         public string Gener { get; set; }
 
         public string? CurrentChatId { get; set; } = string.Empty;
-        public string? CurrentConnectionId { get; set; }= string.Empty;
+        public string? CurrentConnectionId { get; set; } = string.Empty;
 
-
-       public User(string userName, string email, string pass, string? gener)
+        public User(string userName, string email, string pass, string? gener)
         {
             UserName = userName;
             Email = email;

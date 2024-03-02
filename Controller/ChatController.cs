@@ -1,14 +1,12 @@
+using ChatBody;
+using ChatModel;
+using CreateDTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
-
-
 using UserContext;
-using ChatModel;
 using UserModel;
-using ChatBody;
-using CreateDTO;
 
 namespace Controllers
 {
@@ -22,8 +20,8 @@ namespace Controllers
             _context = context;
             _logger = logger;
         }
-        
-         [Authorize(Policy = "Bearer")]
+
+        [Authorize(Policy = "Bearer")]
         [HttpGet("GetAllRooms")]
         public async Task<ActionResult<List<Chat>>> GetAllRooms([FromHeader] string authorization)
         {
@@ -31,10 +29,11 @@ namespace Controllers
             return Ok(allRooms);
         }
 
-                
         [Authorize(Policy = "Bearer")]
         [HttpPost("CreateRoom")]
-        public async Task<ActionResult<CreateRoomModel>> CreateRoom([FromBody] CreateRoomModel model)
+        public async Task<ActionResult<CreateRoomModel>> CreateRoom(
+            [FromBody] CreateRoomModel model
+        )
         {
             try
             {
@@ -66,7 +65,6 @@ namespace Controllers
                     ChatName = chatRoom.ChatName,
                     OnlineUser = chatRoom.OnlineUser,
                     Owner = user.Id,
-
                 };
                 var _responseCreatedChat = $"Chat was Created with sucess!: {_chatDTOresp}";
 
@@ -75,20 +73,22 @@ namespace Controllers
             catch (Exception ex)
             {
                 return BadRequest($"An error ocurred + {ex}");
-            };
-                }
+            }
+            ;
+        }
 
-            [Authorize(Policy = "Bearer")]
-            [HttpDelete("Delete")]
-                public async Task<ActionResult> DeleteRoom(string userId, string chat)
-                {
-                try
-                {
+        [Authorize(Policy = "Bearer")]
+        [HttpDelete("Delete")]
+        public async Task<ActionResult> DeleteRoom(string userId, string chat)
+        {
+            try
+            {
                 var user = await _context.Users.FindAsync("5d8c9046-0c60-4aba-b447-22879a0542cd");
-                
+
                 if (user == null)
                 {
-                    var userNotFoundMessage = $"UserId {userId} was not found. It is not possible to delete a room for a non-existent user.";
+                    var userNotFoundMessage =
+                        $"UserId {userId} was not found. It is not possible to delete a room for a non-existent user.";
                     return NotFound(userNotFoundMessage);
                 }
 
@@ -104,15 +104,12 @@ namespace Controllers
                 await _context.SaveChangesAsync();
 
                 return Ok("Room deleted successfully.");
-                }
-                catch (Exception ex)
-                {
+            }
+            catch (Exception ex)
+            {
                 var errorMessage = $"An error occurred: {ex.Message}";
                 return BadRequest(errorMessage);
             }
         }
-
-
-
     }
 }
