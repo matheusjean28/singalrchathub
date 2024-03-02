@@ -112,7 +112,7 @@ namespace AuthControllerMethod
 
                 if (searchedUser != null)
                 {
-                    if (isValidPasswordComparedWithHashed(searchedUser.Pass, user.Password))
+                    if (IsValidPasswordComparedWithHashed(searchedUser.Pass, user.Password))
                     {
                         var userToken = new
                         {
@@ -156,23 +156,13 @@ namespace AuthControllerMethod
         //move to other component after finish
         public async Task<bool> CheckIfUserExist(User user)
         {
-            var userNameExist = await _context.Users.AnyAsync(u => u.UserName == user.UserName);
-            var userEmailExist = await _context.Users.AnyAsync(u => u.Email == user.Email);
-
-            if (userNameExist && userEmailExist)
-            {
-                return true;
-            }
-            return false;
+            bool userExists = await _context.Users.AnyAsync(u =>
+                u.UserName == user.UserName || u.Email == user.Email
+            );
+            return userExists;
         }
 
-        public bool IsValidPassword(string paswordFromParams, string passwordFromDb)
-        {
-            var isEqualPass = passwordFromDb.Trim().Equals(paswordFromParams.Trim());
-            return isEqualPass;
-        }
-
-        public bool isValidPasswordComparedWithHashed(string hashedPassword, string plainPassword)
+        public bool IsValidPasswordComparedWithHashed(string hashedPassword, string plainPassword)
         {
             return BCrypt.Net.BCrypt.Verify(plainPassword, hashedPassword);
         }
