@@ -1,16 +1,14 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using AuthServiceJwt;
-using Microsoft.AspNetCore.Authorization;
+using ChatModel;
+using ChatSignalR.Models.WrapperChat;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using UserContext;
 using UserLoginDTO;
 using UserLoginModel;
 using UserModel;
-using ChatSignalR.Models.WrapperChat;
-
 
 namespace AuthControllerMethod
 {
@@ -37,7 +35,6 @@ namespace AuthControllerMethod
         {
             try
             {
-
                 if (user == null)
                 {
                     return BadRequest("Unexpected error occurred");
@@ -72,34 +69,32 @@ namespace AuthControllerMethod
                 return BadRequest("An error occurred during account creation.");
             }
         }
-        
-      [Route("/GetAllChats")]
+
+        [Route("/GetAllChats")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetAllChats(string id)
         {
-            var user = await _context.Users.Include(u => u.MyOwnsChatIds).FirstOrDefaultAsync(u => u.Id == id);
+            var user = await _context
+                .Users.Include(u => u.MyOwnsChatIds)
+                .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
             {
-                return NotFound(); 
+                return NotFound();
             }
 
-            var chatsOfUser = user.MyOwnsChatIds.Select(c => new
-            {
-                ChatName = c.ChatName, 
-                ChatId = c.Id,
-            }).ToList();
+            var chatsOfUser = user
+                .MyOwnsChatIds.Select(c => new { c.ChatName, ChatId = c.Id, })
+                .ToList();
 
             return chatsOfUser;
         }
-
 
         // [Authorize]
         [Route("/getAllUser")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
-
             return await _context.Users.ToListAsync();
         }
 
@@ -129,18 +124,22 @@ namespace AuthControllerMethod
                             Id = searchedUser.Id,
                             UserName = searchedUser.UserName,
                             Email = searchedUser.Email,
-                            OwnsChatIds = searchedUser.MyOwnsChatIds.ToList(),
-                            Token = userToken
+                            Token = userToken,
+                            MyChats = await _context
+                                .Chats.Where(u => u.OwnerId == searchedUser.Id)
+                                .Select(u => new WrapperChat
+                                {
+                                    Id = u.ChatID,
+                                    ChatName = u.ChatName,
+                                })
+                                .ToListAsync()
                         };
-
-                        
-                        _logger.LogInformation("{searchedUser}",searchedUser.MyOwnsChatIds);
 
                         return Ok(responseAuthUserOk);
                     }
                     else
                     {
-                        return BadRequest("Wrong Password!");
+                        return BadRequest("An error was ocurred!");
                     }
                 }
 
