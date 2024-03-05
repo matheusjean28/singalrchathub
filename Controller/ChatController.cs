@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using UserContext;
 using UserModel;
+using Enums;
 
 namespace Controllers
 {
@@ -29,6 +30,39 @@ namespace Controllers
             var allRooms = await _context.Chats.ToListAsync();
             return Ok(allRooms);
         }
+
+        [HttpPost("/IncludeAdm")]
+        public async Task<ActionResult<object>> IncludeAdm(string userId, string ChatId)
+        {
+            try
+            {
+                var _chat = await _context.Chats.FindAsync(ChatId);
+                if(_chat == null)
+                {
+                    return BadRequest("Chat Not Found");
+                }
+                return Ok("ok");
+
+                 var permission = new UserPermission
+                {
+                    UserId = userId,
+                    PermissionLevel = UserPermissionLevel.BasicManeger,
+                };
+
+                Chat.UserPermissions.Add(permission);
+                await _context.SaveChangesAsync();
+
+                
+
+            }
+            catch (Exception ex)
+            {
+                
+                return BadRequest("ex");
+            }
+            
+        }
+
 
         // [Authorize(Policy = "Bearer")]
         [HttpPost("CreateRoom")]

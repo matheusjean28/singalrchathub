@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using UserModel;
+using Enums;
 
 namespace ChatModel
 {
@@ -8,13 +11,12 @@ namespace ChatModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-
         public string ChatID { get; set; }
 
         [Required(ErrorMessage = "ChatName is required")]
         public string ChatName { get; set; }
 
-        //if not declared, defoult value is "10"
+        //if not declared, default value is "10"
         public int OnlineUser { get; set; } = 10;
 
         [ForeignKey("Owner")]
@@ -22,5 +24,18 @@ namespace ChatModel
         public User Owner { get; set; }
 
         public virtual ICollection<User> Users { get; set; }
+
+        public List<UserPermission> UserPermissions { get; set; } 
+
+        public List<UserPermission> GetUserPermissions()
+        {
+            return UserPermissions;
+        }
+    }
+
+    public class UserPermission
+    {
+        public string UserId { get; set; }
+        public UserPermissionLevel PermissionLevel { get; set; } = 0;
     }
 }
