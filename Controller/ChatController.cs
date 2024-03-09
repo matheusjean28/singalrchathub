@@ -1,5 +1,6 @@
 using ChatBody;
 using ChatModel;
+using ChatSignalR.Dtos;
 using ChatSignalR.Models.PermisionsChat;
 using ChatSignalR.Models.WrapperChat;
 using CreateDTO;
@@ -24,14 +25,38 @@ namespace Controllers
             _logger = logger;
         }
 
-        //  [Authorize(Policy = "Bearer")]
-        // [HttpGet("GetAllRooms")]
-        // public async Task<ActionResult<List<object>>> GetAllRooms([FromHeader] string authorization)
-        // {
-        //     // var _allchats = await _context.Chats.ToListAsync();
+        [HttpGet("GetAllAvaliableChats")]
+        public async Task<ActionResult<IEnumerable<ChatResponseModelDTO>>> GetAllAvaliableChats()
+        {
+            try
+            {
+                var chats = await _context
+                    .Chats.Include(c => c.UserPermissionList)
+                    .Select(c => new ChatResponseModelDTO
+                    {
+                        ChatID = c.ChatID,
+                        ChatName = c.ChatName,
+                        OnlineUser = c.OnlineUser,
+                        OwnerId = c.OwnerId,
+                        UserPermissionList = c
+                            .UserPermissionList.Select(up => new UserPermissionDataResponseModelDTO
+                            {
+                                Id = up.Id,
+                                ChatID = up.ChatID,
+                                UserId = up.UserId,
+                                PermissionLevel = (int)up.PermissionLevel
+                            })
+                            .ToList()
+                    })
+                    .ToListAsync();
 
-        //     return Ok(_allchats);
-        // }
+                return Ok(chats);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Err4r on get cha, please try again later.");
+            }
+        }
 
         [HttpPost("/IncludeAdm")]
         public async Task<ActionResult<object>> IncludeAdm(string userId, string ChatId)
@@ -47,7 +72,7 @@ namespace Controllers
                 var _userId = await _context.Users.FindAsync(userId);
                 if (_userId == null)
                 {
-                    return BadRequest("user id Dont Exists");
+                    return BadRequest("User Not Found");
                 }
                 var permission = new UserPermissionData
                 {
@@ -61,7 +86,7 @@ namespace Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest("ex");
+                return BadRequest($"{ex}");
             }
         }
 
@@ -94,6 +119,16 @@ namespace Controllers
                 user.CurrentChatId = chatRoom.ChatID;
                 await _context.SaveChangesAsync();
 
+                //create a new userPermission instance and save them at database
+                var permission = new UserPermissionData
+                {
+                    UserId = model.UserId,
+                    PermissionLevel = UserPermissionLevel.FullManeger,
+                };
+
+                chatRoom.UserPermissionList.Add(permission);
+                await _context.SaveChangesAsync();
+
                 //response dto with public data
                 var _chatDTOresp = new CreateRoomDTO
                 {
@@ -113,14 +148,12 @@ namespace Controllers
                 //take user and add chat wrapper with name and id about that chat
                 user.AddChat(_newWrapperChat);
                 await _context.SaveChangesAsync();
-
                 return Ok(_chatDTOresp);
             }
             catch (Exception ex)
             {
                 return BadRequest($"An error occurred: {ex.Message}");
-            }
-            ;
+            };
         }
 
         [Authorize(Policy = "Bearer")]

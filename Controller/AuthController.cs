@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using AuthServiceJwt;
 using ChatModel;
+using ChatSignalR.Models.PermisionsChat;
 using ChatSignalR.Models.WrapperChat;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -42,14 +43,16 @@ namespace AuthControllerMethod
 
                 if (await CheckIfUserExist(user))
                 {
-                    var userAlreadyExistMessage = $"{user.UserName} already exists";
+                    var userAlreadyExistMessage = $"Name Already Used";
                     return Conflict(userAlreadyExistMessage);
                 }
 
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Pass);
+
                 var newUser = new User(user.UserName, user.Email, hashedPassword, user.Gener);
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
+
                 var authToken = await _authJwt.GenerateJwtToken(user.UserName);
 
                 var response = new
@@ -70,34 +73,27 @@ namespace AuthControllerMethod
             }
         }
 
-        [Route("/GetAllChats")]
+        //as name say, get only chats that related with this user
+        [Route("/GetOnlyUserChats")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<object>>> GetAllChats(string id)
+        public async Task<ActionResult<object>> GetOnlyUserChats(string id)
         {
             var user = await _context
                 .Users.Include(u => u.MyOwnsChatIds)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
-            {
-                return NotFound();
+            {  
+                var message = "User NotFount";
+                return NotFound(message);
             }
 
             var chatsOfUser = user
                 .MyOwnsChatIds.Select(c => new { c.ChatName, ChatId = c.Id, })
                 .ToList();
-
             return chatsOfUser;
         }
-
-        // [Authorize]
-        [Route("/getAllUser")]
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
-        {
-            return await _context.Users.ToListAsync();
-        }
-
+        
         //check other params also,
         //return DTO that contains name, userId, gender only
         [Route("Auth")]
