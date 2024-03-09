@@ -1,14 +1,15 @@
 using ChatBody;
 using ChatModel;
+using ChatSignalR.Models.PermisionsChat;
 using ChatSignalR.Models.WrapperChat;
 using CreateDTO;
+using Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using UserContext;
 using UserModel;
-using Enums;
 
 namespace Controllers
 {
@@ -24,12 +25,13 @@ namespace Controllers
         }
 
         //  [Authorize(Policy = "Bearer")]
-        [HttpGet("GetAllRooms")]
-        public async Task<ActionResult<List<Chat>>> GetAllRooms([FromHeader] string authorization)
-        {
-            var allRooms = await _context.Chats.ToListAsync();
-            return Ok(allRooms);
-        }
+        // [HttpGet("GetAllRooms")]
+        // public async Task<ActionResult<List<object>>> GetAllRooms([FromHeader] string authorization)
+        // {
+        //     // var _allchats = await _context.Chats.ToListAsync();
+
+        //     return Ok(_allchats);
+        // }
 
         [HttpPost("/IncludeAdm")]
         public async Task<ActionResult<object>> IncludeAdm(string userId, string ChatId)
@@ -37,32 +39,31 @@ namespace Controllers
             try
             {
                 var _chat = await _context.Chats.FindAsync(ChatId);
-                if(_chat == null)
+                if (_chat == null)
                 {
                     return BadRequest("Chat Not Found");
                 }
-                return Ok("ok");
 
-                 var permission = new UserPermission
+                var _userId = await _context.Users.FindAsync(userId);
+                if (_userId == null)
+                {
+                    return BadRequest("user id Dont Exists");
+                }
+                var permission = new UserPermissionData
                 {
                     UserId = userId,
                     PermissionLevel = UserPermissionLevel.BasicManeger,
                 };
 
-                Chat.UserPermissions.Add(permission);
+                _chat.UserPermissionList.Add(permission);
                 await _context.SaveChangesAsync();
-
-                
-
+                return Ok(permission);
             }
             catch (Exception ex)
             {
-                
                 return BadRequest("ex");
             }
-            
         }
-
 
         // [Authorize(Policy = "Bearer")]
         [HttpPost("CreateRoom")]
