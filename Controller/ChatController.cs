@@ -20,7 +20,12 @@ namespace Controllers
         private readonly UserDbContext _context;
         private readonly ILogger _logger;
         private readonly ChatService _service;
-        public ChatController(UserDbContext context, ILogger<ChatController> logger, ChatService service)
+
+        public ChatController(
+            UserDbContext context,
+            ILogger<ChatController> logger,
+            ChatService service
+        )
         {
             _context = context;
             _logger = logger;
@@ -62,38 +67,52 @@ namespace Controllers
 
         [HttpPost("/IncludeAdm")]
         public async Task<ActionResult<object>> IncludeAdm(
-            string userClainToAdd,
-            string userId,
-            string ChatId
+            string userClaimToAdd,
+            string userIdToAdd,
+            string ChatId,
+            int UserLevel
         )
         {
             try
-            {
-                //change this method to return error message right
-                if (!await _service.CheckIfUserIsAdminAndUserExist(userClainToAdd, userId))
                 {
-                    return BadRequest("You are not an Admin!");
+
+                if (
+                string.IsNullOrEmpty(userClaimToAdd) 
+                || string.IsNullOrEmpty(userIdToAdd) 
+                || string.IsNullOrEmpty(ChatId))
+                {
+                    return BadRequest("Invalid input. Please provide valid parameters.");
                 }
 
 
+                //if user exist and is owner cannot change, otherwise 
+                //if chat exists and user are not owner, it can changed
+                if(await _service.CheckIfChatAndUserExistAsync( userIdToAdd,  ChatId))
+                {
+                    return BadRequest("Onwer cannot have your level changed!, Or chat does not exists");
+                }
+                if (!await _service.CheckIfUserIsAdminAndUserExist(userClaimToAdd, userIdToAdd))
+                {
+                    //next check for errors
+                    //if user level be bottom than 2 he cannot add other users.
+                    return BadRequest(
+                        "An error occurred! You may not have sufficient permissions or the user to be added does not exist."
+                    );
+                }
 
+                //instance of current chat to save
+                if (!CheckIfIsAValidEnum(UserLevel))
+                {
+                    return BadRequest("Invalid user level. Please provide a valid user level.");
+                }
 
                 var _chat = await _context.Chats.FindAsync(ChatId);
-                if (_chat == null)
-                {
-                    return BadRequest("Chat Not Found");
-                }
-
-                var _userId = await _context.Users.FindAsync(userId);
-                if (_userId == null)
-                {
-                    return BadRequest("User Not Found");
-                }
 
                 var permission = new UserPermissionData
                 {
-                    UserId = userId,
-                    PermissionLevel = UserPermissionLevel.BasicManeger,
+                    UserId = userIdToAdd,
+                    ChatID = ChatId,
+                    PermissionLevel = (UserPermissionLevel)UserLevel 
                 };
 
                 _chat.UserPermissionList.Add(permission);
@@ -102,7 +121,7 @@ namespace Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"{ex}");
+                return BadRequest($"An error was ocurred: {ex}");
             }
         }
 
@@ -179,7 +198,7 @@ namespace Controllers
         {
             try
             {
-                var user = await _context.Users.FindAsync("5d8c9046-0c60-4aba-b447-22879a0542cd");
+                var user = await _context.Users.FindAsync(userId);
 
                 if (user == null)
                 {
@@ -206,6 +225,13 @@ namespace Controllers
                 var errorMessage = $"An error occurred: {ex.Message}";
                 return BadRequest(errorMessage);
             }
+        }
+
+        //check if value of enum existing
+        public bool CheckIfIsAValidEnum(int enumValue)
+        {
+            bool isValidEnum = Enum.IsDefined(typeof(UserPermissionLevel), enumValue);
+            return isValidEnum;
         }
     }
 }

@@ -92,21 +92,43 @@ namespace ChatHubServices
             return "OK";
         }
 
+        //here we already check if that chat exists and at CheckIfUserIsAdminAndUserExist
+        //we dont need to check it again
+        [HttpGet("CheckIfChatAndUserExistAsync")]
+        public async Task<bool> CheckIfChatAndUserExistAsync(string userIdToAdd, string ChatId)
+        {
+            //check if chat exist
+            var chat = await _context.Chats.AnyAsync(chat => chat.ChatID == ChatId);
+            var userIsAdmin = await _context.Chats.AnyAsync(chat =>
+                chat.ChatID == ChatId && chat.OwnerId == userIdToAdd
+            );
+
+            if (chat)
+            {
+                return userIsAdmin;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         //check if user is an admin of the chat
         //and check if user to add is valid and if exists
         //protect with auth later
         [HttpGet]
         public async Task<bool> CheckIfUserIsAdminAndUserExist(string userId, string userToAdd)
         {
-
             var isAdmin = await _context.UserPermission.AnyAsync(permission =>
                 permission.UserId == userId
                 && permission.PermissionLevel == UserPermissionLevel.FullManeger
             );
 
             var userExist = await _context.Users.AnyAsync(user => user.Id == userToAdd);
-            return isAdmin && userExist;
-        }   
 
+            Console.WriteLine(isAdmin);
+            Console.WriteLine(userExist);
+            return isAdmin && userExist;
+        }
     }
 }
