@@ -1,4 +1,5 @@
 using ChatBody;
+using ChatHubServices;
 using ChatModel;
 using ChatSignalR.Dtos;
 using ChatSignalR.Models.PermisionsChat;
@@ -18,11 +19,12 @@ namespace Controllers
     {
         private readonly UserDbContext _context;
         private readonly ILogger _logger;
-
-        public ChatController(UserDbContext context, ILogger<ChatController> logger)
+        private readonly ChatService _service;
+        public ChatController(UserDbContext context, ILogger<ChatController> logger, ChatService service)
         {
             _context = context;
             _logger = logger;
+            _service = service;
         }
 
         [HttpGet("GetAllAvaliableChats")]
@@ -59,10 +61,23 @@ namespace Controllers
         }
 
         [HttpPost("/IncludeAdm")]
-        public async Task<ActionResult<object>> IncludeAdm(string userId, string ChatId)
+        public async Task<ActionResult<object>> IncludeAdm(
+            string userClainToAdd,
+            string userId,
+            string ChatId
+        )
         {
             try
             {
+                //change this method to return error message right
+                if (!await _service.CheckIfUserIsAdminAndUserExist(userClainToAdd, userId))
+                {
+                    return BadRequest("You are not an Admin!");
+                }
+
+
+
+
                 var _chat = await _context.Chats.FindAsync(ChatId);
                 if (_chat == null)
                 {
@@ -74,6 +89,7 @@ namespace Controllers
                 {
                     return BadRequest("User Not Found");
                 }
+
                 var permission = new UserPermissionData
                 {
                     UserId = userId,
@@ -153,7 +169,8 @@ namespace Controllers
             catch (Exception ex)
             {
                 return BadRequest($"An error occurred: {ex.Message}");
-            };
+            }
+            ;
         }
 
         [Authorize(Policy = "Bearer")]

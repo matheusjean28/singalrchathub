@@ -93,6 +93,7 @@ namespace AuthControllerMethod
                 .ToList();
             return chatsOfUser;
         }
+
         
         //check other params also,
         //return DTO that contains name, userId, gender only
