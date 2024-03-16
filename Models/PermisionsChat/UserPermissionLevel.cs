@@ -16,6 +16,7 @@ namespace ChatSignalR.Models.PermisionsChat
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
+        public string UserName { get; set; }
 
         [ForeignKey("ChatID")]
         public string ChatID { get; set; }

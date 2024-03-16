@@ -49,8 +49,9 @@ namespace Controllers
                             .UserPermissionList.Select(up => new UserPermissionDataResponseModelDTO
                             {
                                 Id = up.Id,
-                                ChatID = up.ChatID,
                                 UserId = up.UserId,
+                                UserName = up.UserName,
+                                ChatID = up.ChatID,
                                 PermissionLevel = (int)up.PermissionLevel
                             })
                             .ToList()
@@ -107,10 +108,12 @@ namespace Controllers
                 }
 
                 var _chat = await _context.Chats.FindAsync(ChatId);
+                var _userName = await _context.Users.FindAsync(userIdToAdd);
 
                 var permission = new UserPermissionData
                 {
                     UserId = userIdToAdd,
+                    UserName = _userName.UserName,
                     ChatID = ChatId,
                     PermissionLevel = (UserPermissionLevel)UserLevel 
                 };
@@ -157,6 +160,7 @@ namespace Controllers
                 //create a new userPermission instance and save them at database
                 var permission = new UserPermissionData
                 {
+                    UserName = user.UserName,
                     UserId = model.UserId,
                     PermissionLevel = UserPermissionLevel.FullManeger,
                 };
@@ -171,6 +175,7 @@ namespace Controllers
                     ChatName = chatRoom.ChatName,
                     OnlineUser = chatRoom.OnlineUser,
                     Owner = user.Id,
+
                 };
 
                 var _responseCreatedChat = $"Chat was Created with sucess!: {_chatDTOresp}";

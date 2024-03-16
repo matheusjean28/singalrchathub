@@ -17,8 +17,9 @@ namespace ChatSignalR.Dtos
     public class UserPermissionDataResponseModelDTO
     {
         public string Id { get; set; }
-        public string ChatID { get; set; }
         public string UserId { get; set; }
+        public string UserName { get; set; }
+        public string ChatID { get; set; }
         public int PermissionLevel { get; set; }
     }
 }
